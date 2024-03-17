@@ -42,11 +42,10 @@ class MultiThreadedClient(threading.Thread):
 
     def receive_data(self):
         while not self.stop_flag.is_set(): # Check the stop flag in the loop
-            print("Main Servering")
             try:
                 data = self.client_socket.recv(1024)            
-                msg = self.decode_json(data)        
-                print("Main Server: >>> " + str(msg))
+                msg = self.decode_json(data)
+                print("Server: " + str(msg))    
                 if not msg:
                     break
                 if type(msg) is list:
@@ -82,27 +81,27 @@ class MultiThreadedClient(threading.Thread):
     def connect_to_chat(self):
         self.stop_flag.set()
         self.stop_chat_flag.clear()
-        self.chat_thread.start()
+        self.chat_thread = threading.Thread(target=self.receive_messages_chat).start()
     
     def send_chat_message(self, message):
         if message:
             self.client_socket.send(message.encode('utf-8'))
 
 
-    def receive_messages_chat(self, ):
+    def receive_messages_chat(self):
         while not self.stop_chat_flag.is_set():
             try:
                 data = self.client_socket.recv(1024)
                 if not data:
                     break
                 msg = self.decode_json(data)
-                print("Chat: >>> " + str(msg))
+                print("CHAT: " + str(msg))
                 self.chat_messages.append(msg)
             except Exception as e:
                 break
 
     def leave_chat(self):
         self.stop_flag.clear()
-        self.client_thread.join()
         self.stop_chat_flag.set()
+        self.client_thread = threading.Thread(target=self.receive_data).start()
     
