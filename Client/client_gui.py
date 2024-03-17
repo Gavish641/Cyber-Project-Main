@@ -205,7 +205,6 @@ class GUI:
         main_frame.title("LuminaMentia Main")
 
         if "registration" in self.top_levels:
-            print(self.top_levels)
             self.top_levels["registration"].destroy()
         if "first_window" in self.top_levels:
             self.top_levels["first_window"].destroy()
@@ -445,8 +444,12 @@ class GUI:
     def update_chat_messages(self, text_area):
         if self.client.chat_messages != []:
             for msg in self.client.chat_messages:
-                text_area.insert(END, str(self.client.username + ": " + msg + "\n"))
-                text_area.see(END)
+                print(msg)
+                if msg[2] and (msg[2] == "temp message" or msg[2] == "kicking client"):
+                    pass
+                else:
+                    text_area.insert(END, msg + "\n")
+                    text_area.see(END)
                 self.client.chat_messages.remove(msg)
         self.top_levels["game"].after(1000, lambda: self.update_chat_messages(text_area))
 
